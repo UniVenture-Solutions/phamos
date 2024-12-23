@@ -1,0 +1,37 @@
+{
+ "cards": [
+  {
+   "card": "Your Total Projects"
+  },
+  {
+   "card": "Total Projects"
+  },
+  {
+   "card": "Total Hrs Worked Today"
+  },
+  {
+   "card": "Total Hrs Worked This Week"
+  },
+  {
+   "card": "Total Hrs Worked This Month"
+  }
+ ],
+ "charts": [
+  {
+   "chart": "Project Summary",
+   "width": "Half"
+  }
+ ],
+ "creation": "2024-04-15 18:27:11.940763",
+ "dashboard_name": "Project Management",
+ "docstatus": 0,
+ "doctype": "Dashboard",
+ "idx": 0,
+ "is_default": 0,
+ "is_standard": 1,
+ "modified": "2024-09-30 10:00:23.148176",
+ "modified_by": "sonali.narkar@phamos.eu",
+ "module": "Phamos",
+ "name": "Project Management",
+ "owner": "Administrator"
+}
