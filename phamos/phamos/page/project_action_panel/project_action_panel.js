@@ -147,13 +147,19 @@ frappe.pages["project-action-panel"].on_page_load = function (wrapper) {
     frappe.db.get_value(
       "Timesheet Record",
       { name: timesheet_record },
-      ["goal", "from_time"],
+      ["goal", "from_time", "expected_time"],
       function (value) {
         // Your code here
         from_time_formatted = frappe.datetime.str_to_user(value.from_time);
         timesheet_record_info =
           "From time: " + from_time_formatted + ",<br>Goal is: " + value.goal;
+        let from_time_date = new Date(value.from_time);
+        let expected_time_in_seconds = value.expected_time;
 
+        from_time_date.setSeconds(from_time_date.getSeconds() + expected_time_in_seconds)
+
+        let to_time_formatted = moment(from_time_date).format("YYYY-MM-DD HH:mm:ss");
+        
         frappe.db.get_value(
           "Employee",
           { user_id: frappe.session.user },
@@ -213,6 +219,14 @@ frappe.pages["project-action-panel"].on_page_load = function (wrapper) {
                   default: timesheet_record_info,
                 },
                 {
+                  label: "Expected End Time",
+                  fieldname: "to_time",
+                  fieldtype: "Datetime",
+                  reqd: 1,
+                  default: to_time_formatted,
+                  read_only: 1
+                },
+                {
                   fieldtype: "Column Break",
                 },
                 {
@@ -220,6 +234,7 @@ frappe.pages["project-action-panel"].on_page_load = function (wrapper) {
                   fieldname: "to_time",
                   fieldtype: "Datetime",
                   reqd: 1,
+                  default: to_time_formatted,
                 },
 
                 {
@@ -256,20 +271,40 @@ frappe.pages["project-action-panel"].on_page_load = function (wrapper) {
                   fieldtype: "Small Text",
                   reqd: 1,
                   description:
-                    "⚠️ This information is sent to the customer next day. Please make sure to wright meaningful text. Adding Issues ID's and or URL is helpful.",
+                    "⚠️ This information is sent to the customer next day. Please make sure to write meaningful text. Adding Issues ID's and or URL is helpful.",
                 },
               ],
               primary_action_label: __("Update Timesheet Record."),
               primary_action(values) {
-                update_and_submit_timesheet_record(
-                  values.timesheet_record,
-                  values.task,
-                  values.to_time,
-                  values.percent_billable,
-                  values.activity_type,
-                  values.result
-                );
-                dialog.hide();
+                if(values.to_time !== to_time_formatted) {
+                  frappe.confirm( 
+                    __('Expected time is not equals to End Time. Do you want to proceed?'),
+                    () => {
+                      update_and_submit_timesheet_record(
+                        values.timesheet_record,
+                        values.task,
+                        values.to_time,
+                        values.percent_billable,
+                        values.activity_type, 
+                        values.result
+                        );
+                      dialog.hide();
+                    },
+                    () => {
+                    }
+                  );
+                } else {
+                  update_and_submit_timesheet_record(
+                    values.timesheet_record,
+                    values.task,
+                    values.to_time,
+                      values.percent_billable,
+                      values.activity_type, 
+                      values.result
+                    );
+                  dialog.hide();
+                }
+                
               },
             });
             // Set the width using CSS
@@ -424,6 +459,7 @@ frappe.pages["project-action-panel"].on_page_load = function (wrapper) {
                   fieldname: "expected_time",
                   in_list_view: 1,
                   reqd: 1,
+                  read_only: 0,
                 },
                 {
                   fieldtype: "Column Break",
@@ -822,3 +858,5 @@ document.head.appendChild(style);
 }
 
 };
+
+
